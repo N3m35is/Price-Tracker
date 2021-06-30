@@ -11,7 +11,7 @@ Open Mongo Terminal
 1. ```use test```
 2. ```db.createCollection('products')```
 
-Download this code as zip and extract it to some path for example C:\temp\Price-Tracker
+Download this code as zip and extract it to some path. For example C:\temp\Price-Tracker
 Open CMD as admin and run the following command ```cd C:\temp\Price-Tracker```
 
 Now install all dependencies with the following command. Note this is a one-time-step
