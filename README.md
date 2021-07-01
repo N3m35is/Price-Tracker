@@ -6,12 +6,12 @@ This is a simple price tracker. Rather than storing price of all products on ama
 Script to update price on daily basis is still in development.
 
 ## Usage
-Download and install MongoDB and create a database test and a collection products. Commands to do so is given below.
+Download and install MongoDB and create a database 'test' and a collection 'products'. Commands to do so is given below.
 Open Mongo Terminal
 1. ```use test```
 2. ```db.createCollection('products')```
 
-Download this code as zip and extract it to some path for example C:\temp\Price-Tracker
+Download this code as zip and extract it to some path. For example C:\temp\Price-Tracker
 Open CMD as admin and run the following command ```cd C:\temp\Price-Tracker```
 
 Now install all dependencies with the following command. Note this is a one-time-step
