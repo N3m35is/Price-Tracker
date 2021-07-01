@@ -5,6 +5,8 @@ from bs4 import BeautifulSoup
 from lxml import etree
 import requests
 from datetime import datetime
+from tkinter import *
+import matplotlib.pyplot as plt
 
 HEADERS = ({'User-Agent':
             'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 \
@@ -62,21 +64,8 @@ def fetchDataFromDatabase(products, productName, price, URL):
         print("It Seems The Current Product Doesn't Exist In Our Database. Don't worry we have updated it.")
     return priceValues
 
-class FetchException(Exception):
-    """Raised when there is a problem while fetching data"""
-    pass
-
-class DatabaseConnectivityException(Exception):
-    """Raised when there is a problem connecting to Database"""
-    pass
-
-class FetchFromDatabaseException(Exception):
-    """Raised when there is a problem fetching data from a database"""
-    pass
-
-def main():
+def buttonclick(URL, welcomeLabel):
     try:
-        URL = input("Welcome, Enter the URL for which to get price history\n")
         details = getDetailsFromURL(URL)
         if(details == None):
             raise FetchException
@@ -90,18 +79,50 @@ def main():
         products = db['products']
 
         priceValues = fetchDataFromDatabase(products, productName, price, URL)
+        
+        graphDateValues = list(priceValues.keys())
+        graphPriceValues = list(priceValues.values())
 
-        for time in priceValues:
-            print(time + " :  " + str(priceValues[time]))
+        plt.plot(graphDateValues, graphPriceValues)
+        plt.title('Price History')
+        plt.xlabel('Date')
+        plt.ylabel('Price')
+        plt.xticks(rotation=30)
+        plt.show()
 
     except FetchException:
-        print("Error Fetching Data From URL")
+        welcomeLabel.configure(text="Error Fetching Data From URL", fg="red")
     except DatabaseConnectivityException:
-        print("Error Connecting To Database")
+        welcomeLabel.configure(text="Error Connecting To Database", fg="red")
     except FetchFromDatabaseException:
-        print("Error Fetching Records From Database")
+        welcomeLabel.configure(text="Error Fetching Records From Database", fg="red")
     except:
-        print("Something Went Wrong")
+        welcomeLabel.configure(text="Something Went Wrong", fg="red")
 
+
+class FetchException(Exception):
+    """Raised when there is a problem while fetching data"""
+    pass
+
+class DatabaseConnectivityException(Exception):
+    """Raised when there is a problem connecting to Database"""
+    pass
+
+class FetchFromDatabaseException(Exception):
+    """Raised when there is a problem fetching data from a database"""
+    pass
+
+def main():    
+        root = Tk()
+
+        welcomeLabel = Label(root, text = "Welcome, Enter the URL to get price history")
+        welcomeLabel.grid(row = 0, column = 0, padx = 10, pady = 10)
+        inputField = Entry(root, width = 50 , borderwidth = 3)
+        inputField.grid(row = 1, column = 0, padx = 10, pady = 10)
+        button = Button(root, text = "Submit", width = 40, command = lambda: buttonclick(inputField.get(), welcomeLabel))
+        button.grid(row = 2, column = 0, padx = 10, pady = 10)
+        
+        root.mainloop()
+       
 if __name__ == "__main__":
     main()
