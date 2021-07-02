@@ -7,6 +7,8 @@ import requests
 from datetime import datetime
 from tkinter import *
 import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 
 HEADERS = ({'User-Agent':
             'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 \
@@ -64,7 +66,7 @@ def fetchDataFromDatabase(products, productName, price, URL):
         print("It Seems The Current Product Doesn't Exist In Our Database. Don't worry we have updated it.")
     return priceValues
 
-def buttonclick(URL, welcomeLabel):
+def buttonclick(URL, welcomeLabel, root):
     try:
         details = getDetailsFromURL(URL)
         if(details == None):
@@ -83,12 +85,21 @@ def buttonclick(URL, welcomeLabel):
         graphDateValues = list(priceValues.keys())
         graphPriceValues = list(priceValues.values())
 
+        fig = Figure(dpi = 100)
+        plt = fig.add_subplot(111)
         plt.plot(graphDateValues, graphPriceValues)
-        plt.title('Price History')
-        plt.xlabel('Date')
-        plt.ylabel('Price')
-        plt.xticks(rotation=30)
-        plt.show()
+        plt.set_ylim(ymin=0, ymax=graphPriceValues[0]+20000)
+        plt.set_title('Price History')
+        plt.set_xlabel('Date')
+        plt.set_ylabel('Price')
+        plt.tick_params(axis='both', which='major', labelsize=7)
+        plt.tick_params(axis='x',rotation = 45)
+        plt.grid()
+
+        canvas = FigureCanvasTkAgg(fig, master = root)
+        canvas.draw()
+        canvas.get_tk_widget().grid(row=3, column=0, padx=40, pady=20)
+        
 
     except FetchException:
         welcomeLabel.configure(text="Error Fetching Data From URL", fg="red")
@@ -96,8 +107,8 @@ def buttonclick(URL, welcomeLabel):
         welcomeLabel.configure(text="Error Connecting To Database", fg="red")
     except FetchFromDatabaseException:
         welcomeLabel.configure(text="Error Fetching Records From Database", fg="red")
-    except:
-        welcomeLabel.configure(text="Something Went Wrong", fg="red")
+    except Exception as e:
+        welcomeLabel.configure(text=e, fg="red")
 
 
 class FetchException(Exception):
@@ -114,12 +125,13 @@ class FetchFromDatabaseException(Exception):
 
 def main():    
         root = Tk()
+        root.title('Price History')
 
         welcomeLabel = Label(root, text = "Welcome, Enter the URL to get price history")
         welcomeLabel.grid(row = 0, column = 0, padx = 10, pady = 10)
-        inputField = Entry(root, width = 50 , borderwidth = 3)
+        inputField = Entry(root, width = 80 , borderwidth = 3)
         inputField.grid(row = 1, column = 0, padx = 10, pady = 10)
-        button = Button(root, text = "Submit", width = 40, command = lambda: buttonclick(inputField.get(), welcomeLabel))
+        button = Button(root, text = "Submit", width = 20, command = lambda: buttonclick(inputField.get(), welcomeLabel, root))
         button.grid(row = 2, column = 0, padx = 10, pady = 10)
         
         root.mainloop()
