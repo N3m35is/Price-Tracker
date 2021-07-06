@@ -18,9 +18,16 @@ HEADERS = ({'User-Agent':
 
 date = datetime.today().strftime('%Y-%m-%d')
 
-def convertPrice(price):
+def convertedPriceAmazon(price):
     convertedPrice = ""
     for i in price[:price.index(".")]:
+        if (i in ['0','1','2','3','4','5','6','7','8','9']):
+            convertedPrice += i
+    return convertedPrice
+
+def convertedPriceFlipkart(price):
+    convertedPrice = ""
+    for i in price:
         if (i in ['0','1','2','3','4','5','6','7','8','9']):
             convertedPrice += i
     return convertedPrice
@@ -31,11 +38,23 @@ def getDetailsFromURL(URL):
         soup = BeautifulSoup(webpage.content, "html.parser")
         dom = etree.HTML(str(soup))
         
-        productTitle = dom.xpath('//*[@id="productTitle"]')[0].text.strip()
-        price = dom.xpath('//*[@id="priceblock_ourprice"]')[0].text[2:]
-        price = convertPrice(price)
-        
-        return {'title': productTitle, 'price': price}
+        if('amazon' in URL):
+            productTitle = dom.xpath('//*[@id="productTitle"]')[0].text.strip()
+            price = dom.xpath('//*[@id="priceblock_ourprice"]')[0].text[2:]
+            price = convertedPriceAmazon(price)
+            return {'title': productTitle, 'price': price}
+
+        if('flipkart' in URL):
+            productTitle = str(dom.xpath('//*[@id="container"]/div/div[3]/div[1]/div[2]/div[2]/div/div[1]/h1/span/text()[1]')[0]).strip()
+            print(productTitle)
+            try:
+                price = str(dom.xpath('//*[@id="container"]/div/div[3]/div[1]/div[2]/div[2]/div/div[4]/div[1]/div/div[1]')[0].text)
+            except:
+                price = str(dom.xpath('//*[@id="container"]/div/div[3]/div[1]/div[2]/div[2]/div/div[3]/div[1]/div/div[1]')[0].text)
+            price = convertedPriceFlipkart(price)
+            print(price)
+            return {'title': productTitle, 'price': price}
+            
     except:
         return None
 
