@@ -1,4 +1,5 @@
 #imports
+from time import sleep
 from pymongo import MongoClient
 import pprint
 from bs4 import BeautifulSoup
@@ -62,9 +63,36 @@ def fetchDataFromDatabase(products, productName, price, URL):
             }
         }
         products.insert_one(new_product)
-        priceValues = {date: price}
+        priceValues = products.find_one( { 'productName': productName} ).get("price")
         print("It Seems The Current Product Doesn't Exist In Our Database. Don't worry we have updated it.")
     return priceValues
+
+def updateDatabase(welcomeLabel):
+    db = connectToDatabase()
+    if(db == None):
+        raise DatabaseConnectivityException
+    client = db['client']
+    products = db['products']
+    
+    documents = products.find({})
+    for doc in documents:
+        docURL = doc.get("URL")
+        details = getDetailsFromURL(docURL)
+        if(details == None):
+            doc.get("price").update( {date : 0} )
+        else:
+            print("Updating Details For Product: " + details['title'] + "\n")
+            productName = details['title']
+            price = details['price']
+            doc.get("price").update( {date : int(price)} )
+            products.replace_one({ 'productName': productName }, doc )
+        
+    client.close()
+    print("Database Updation Complete")
+    welcomeLabel.configure(text="Database Updating Done ... Enter URL to get price history")
+    
+
+
 
 def buttonclick(URL, welcomeLabel, root):
     try:
@@ -79,11 +107,13 @@ def buttonclick(URL, welcomeLabel, root):
             raise DatabaseConnectivityException
         client = db['client']
         products = db['products']
+        #updateDatabase(products)
 
         priceValues = fetchDataFromDatabase(products, productName, price, URL)
         
         graphDateValues = list(priceValues.keys())
         graphPriceValues = list(priceValues.values())
+
 
         fig = Figure(dpi = 100)
         plt = fig.add_subplot(111)
@@ -131,8 +161,10 @@ def main():
         welcomeLabel.grid(row = 0, column = 0, padx = 10, pady = 10)
         inputField = Entry(root, width = 80 , borderwidth = 3)
         inputField.grid(row = 1, column = 0, padx = 10, pady = 10)
-        button = Button(root, text = "Submit", width = 20, command = lambda: buttonclick(inputField.get(), welcomeLabel, root))
-        button.grid(row = 2, column = 0, padx = 10, pady = 10)
+        submitButton = Button(root, text = "Submit", width = 20, command = lambda: buttonclick(inputField.get(), welcomeLabel, root))
+        submitButton.grid(row = 2, column = 0, padx = 10, pady = 10)
+        updateButton = Button(root, text = "Update Database", width = 20, command = lambda: updateDatabase(welcomeLabel))
+        updateButton.grid(row = 3, column = 0, padx = 10, pady = 10)
         
         root.mainloop()
        
