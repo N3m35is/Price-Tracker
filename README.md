@@ -2,8 +2,8 @@
 A simple price tracker that can show the price of a product with a given URL.
 
 ## Functionality
-This is a simple price tracker. Rather than storing price of all products on amazon, it only stores prices of products of which you have viewed price.
-Script to update price on daily basis is still in development.
+This is a simple price tracker. Rather than storing price of all products on amazon/flipkart, it only stores prices of products of which you have viewed price.
+Update Database Button updates price for every product in the database for the current date. This takes some time.
 
 ## Usage
 Download and install MongoDB and create a database 'test' and a collection 'products'. Commands to do so is given below.
@@ -18,6 +18,6 @@ Now install all dependencies with the following command. Note this is a one-time
 ```pip install -r requirements.txt```
 
 Finally run the script file with the following command
-```python final.py```
+```python price-tracker.py```
 
 This assumes you have python 3.9.0 or above already installed. May work with previous version.
