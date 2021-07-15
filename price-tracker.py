@@ -40,19 +40,19 @@ def getDetailsFromURL(URL):
         
         if('amazon' in URL):
             productTitle = dom.xpath('//*[@id="productTitle"]')[0].text.strip()
-            price = dom.xpath('//*[@id="priceblock_ourprice"]')[0].text[2:]
+            price = dom.xpath('//*[@id="priceblock_ourprice"]')[0].text
             price = convertedPriceAmazon(price)
             return {'title': productTitle, 'price': price}
 
         if('flipkart' in URL):
             productTitle = str(dom.xpath('//*[@id="container"]/div/div[3]/div[1]/div[2]/div[2]/div/div[1]/h1/span/text()[1]')[0]).strip()
-            print(productTitle)
+            #print(productTitle)
             try:
                 price = str(dom.xpath('//*[@id="container"]/div/div[3]/div[1]/div[2]/div[2]/div/div[4]/div[1]/div/div[1]')[0].text)
             except:
                 price = str(dom.xpath('//*[@id="container"]/div/div[3]/div[1]/div[2]/div[2]/div/div[3]/div[1]/div/div[1]')[0].text)
             price = convertedPriceFlipkart(price)
-            print(price)
+            #print(price)
             return {'title': productTitle, 'price': price}
             
     except:
@@ -103,6 +103,7 @@ def updateDatabase(welcomeLabel):
             print("Updating Details For Product: " + details['title'] + "\n")
             productName = details['title']
             price = details['price']
+            print(price)
             doc.get("price").update( {date : int(price)} )
             products.replace_one({ 'productName': productName }, doc )
         
